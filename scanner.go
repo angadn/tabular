@@ -11,7 +11,7 @@ func NewScanner(fields ...interface{}) (scanner Scanner) {
 	return
 }
 
-func (scanner Scanner) Scan(row *sql.Row, joined ...Scanner) (err error) {
+func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 	fields := scanner.Fields
 	for i := 0; i < len(joined); i++ {
 		fields = append(fields, joined[i].Fields...)
@@ -23,7 +23,7 @@ func (scanner Scanner) Scan(row *sql.Row, joined ...Scanner) (err error) {
 		scanArgs[i] = &values[i]
 	}
 
-	if err = row.Scan(scanArgs); err != nil {
+	if err = rows.Scan(scanArgs); err != nil {
 		return
 	}
 
@@ -33,7 +33,7 @@ func (scanner Scanner) Scan(row *sql.Row, joined ...Scanner) (err error) {
 		}
 	}
 
-	err = row.Scan(fields)
+	err = rows.Scan(fields)
 	return
 }
 
