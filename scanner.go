@@ -29,7 +29,7 @@ func (scanner Scanner) Scan(row *sql.Row, joined ...Scanner) (err error) {
 
 	for i, v := range values {
 		if v == nil {
-			fields[i] = &scapegoat{}
+			fields[i] = &Scapegoat{}
 		}
 	}
 
@@ -37,8 +37,10 @@ func (scanner Scanner) Scan(row *sql.Row, joined ...Scanner) (err error) {
 	return
 }
 
-type scapegoat struct{}
+// Scapegoat is to receive values in Scan that we're not interested in.
+type Scapegoat struct{}
 
-func (goat scapegoat) Scan(src interface{}) (err error) {
+// Scan does nothing upon receiving data.
+func (goat Scapegoat) Scan(src interface{}) (err error) {
 	return
 }
