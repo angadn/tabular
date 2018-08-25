@@ -33,7 +33,7 @@ func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 		}
 	}
 
-	err = rows.Scan(fields)
+	err = rows.Scan(fields...)
 	return
 }
 
