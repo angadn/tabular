@@ -23,7 +23,7 @@ func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 		scanArgs[i] = &values[i]
 	}
 
-	if err = rows.Scan(scanArgs); err != nil {
+	if err = rows.Scan(scanArgs...); err != nil {
 		return
 	}
 
