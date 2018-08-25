@@ -17,8 +17,8 @@ func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 		fields = append(fields, joined[i].Fields...)
 	}
 
-	values := make([]sql.RawBytes, len(scanner.Fields))
-	scanArgs := make([]interface{}, len(scanner.Fields))
+	values := make([]sql.RawBytes, len(fields))
+	scanArgs := make([]interface{}, len(fields))
 	for i := range values {
 		scanArgs[i] = &values[i]
 	}
