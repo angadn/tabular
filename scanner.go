@@ -2,15 +2,19 @@ package tabular
 
 import "database/sql"
 
+// Scanner contains pointers to fields that we can Scan SQL values into.
 type Scanner struct {
 	Fields []interface{}
 }
 
+// NewScanner is a constructor for Scanner.
 func NewScanner(fields ...interface{}) (scanner Scanner) {
 	scanner.Fields = fields
 	return
 }
 
+// Scan rows into the fields for the Scanner, chaining with any other scanner in the case
+// of joins.
 func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 	fields := scanner.Fields
 	for i := 0; i < len(joined); i++ {
