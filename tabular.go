@@ -34,18 +34,11 @@ func (tabular Tabular) Insertion(queryFmt string, keyval ...string) (query strin
 		}
 	}
 
-	finalValues := []string{}
-	for _, v := range values {
-		if v != "" {
-			finalValues = append(finalValues, v)
-		}
-	}
-
 	return fmt.Sprintf(queryFmt, fmt.Sprintf(
 		"INSERT INTO `%s` (%s) VALUES (%s)",
 		tabular.Name,
 		fmt.Sprintf("`%s`", strings.Join(tabular.Fields, "`, `")),
-		strings.Join(finalValues, ", "),
+		strings.Join(values, ", "),
 	))
 }
 
