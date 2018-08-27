@@ -19,13 +19,33 @@ func New(name string, fields ...string) (tabular Tabular) {
 	return
 }
 
-// Insertion generates an "INSERT INTO [Name] (...) VALUES (?...)" query.
-func (tabular Tabular) Insertion(queryFmt string) (query string) {
+// Insertion generates an "INSERT INTO [Name] (...) VALUES (?...)" query. You can also
+// configure specific keys to be evaluated as expressions. A common example
+// is Insertion("%s", "created_at", "NOW()", "updated_at", "NOW()"). The returned query
+// can be suffixed with "ON DUPLICATE KEY UPDATE..." for UPSERT-like behaviour.
+func (tabular Tabular) Insertion(queryFmt string, keyval ...string) (query string) {
+	values := strings.Split(strings.Repeat("?", len(tabular.Fields)), "")
+	for i := 0; i < len(keyval); i += 2 {
+		for j, field := range tabular.Fields {
+			if keyval[i] == field {
+				values[j] = keyval[i+1]
+				break
+			}
+		}
+	}
+
+	finalValues := []string{}
+	for _, v := range values {
+		if v != "" {
+			finalValues = append(finalValues, v)
+		}
+	}
+
 	return fmt.Sprintf(queryFmt, fmt.Sprintf(
 		"INSERT INTO `%s` (%s) VALUES (%s)",
 		tabular.Name,
 		fmt.Sprintf("`%s`", strings.Join(tabular.Fields, "`, `")),
-		fmt.Sprintf("?%s", strings.Repeat(", ?", len(tabular.Fields)-1)),
+		strings.Join(finalValues, ", "),
 	))
 }
 
