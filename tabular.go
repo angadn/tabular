@@ -19,6 +19,8 @@ func New(name string, fields ...string) (tabular Tabular) {
 	return
 }
 
+// WithAlias returns a Tabular with it's Name set to an alias. This is useful when
+// JOINing to the same table twice in a single query.
 func (tabular Tabular) WithAlias(alias string) (aliased Tabular) {
 	aliased = tabular
 	aliased.Name = alias
