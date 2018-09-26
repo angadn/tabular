@@ -19,6 +19,12 @@ func New(name string, fields ...string) (tabular Tabular) {
 	return
 }
 
+func (tabular Tabular) WithAlias(alias string) (aliased Tabular) {
+	aliased = tabular
+	aliased.Name = alias
+	return
+}
+
 // Insertion generates an "INSERT INTO [Name] (...) VALUES (?...)" query. You can also
 // configure specific keys to be evaluated as expressions. A common example
 // is Insertion("%s", "created_at", "NOW()", "updated_at", "NOW()"). The returned query

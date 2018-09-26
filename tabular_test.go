@@ -21,6 +21,15 @@ func TestSelection(t *testing.T) {
 	userTab := New("users", "id", "email", "password", "secret")
 	fmt.Printf(
 		"Selection:\t%s\n\n",
-		tab.Selection("SELECT %s FROM `users` WHERE...", userTab),
+		tab.Selection("SELECT %s FROM `users` WHERE ...", userTab),
+	)
+}
+
+func TestDualJoinSelection(t *testing.T) {
+	tab := New("campaigns", "id", "user_id", "secondary_user_id", "enabled", "name")
+	userTab := New("users", "id", "email", "password", "secret")
+	fmt.Printf(
+		"Dual Join:\t%s\n\n",
+		tab.Selection("SELECT %s FROM `users` WHERE ...", userTab, userTab.WithAlias("secondary_user")),
 	)
 }
