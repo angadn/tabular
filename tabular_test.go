@@ -16,6 +16,18 @@ func TestInsertion(t *testing.T) {
 	))
 }
 
+func TestBatchInsertion(t *testing.T) {
+	tab := New("users", "id", "email", "password", "secret", "created_at", "updated_at")
+	fmt.Printf("Batch Insertion:\t%s\n\n", tab.BatchInsertion(
+		"%s",
+		3,
+		"!created_at",
+		"NOW()",
+		"updated_at",
+		"NOW()",
+	))
+}
+
 func TestSelection(t *testing.T) {
 	tab := New("campaigns", "id", "user_id", "enabled", "name")
 	userTab := New("users", "id", "email", "password", "secret")

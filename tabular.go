@@ -32,6 +32,15 @@ func (tabular Tabular) WithAlias(alias string) (aliased Tabular) {
 // is Insertion("%s", "created_at", "NOW()", "updated_at", "NOW()"). The returned query
 // can be suffixed with "ON DUPLICATE KEY UPDATE..." for UPSERT-like behaviour.
 func (tabular Tabular) Insertion(queryFmt string, keyval ...string) (query string) {
+	query = tabular.BatchInsertion(queryFmt, 1, keyval...)
+	return
+}
+
+// BatchInsertion generates an "INSERT INTO [Name] (...) VALUES (?...)" query just like
+// Insertion, but for more than one Row.
+func (tabular Tabular) BatchInsertion(
+	queryFmt string, rows int, keyval ...string,
+) (query string) {
 	values := strings.Split(strings.Repeat("?", len(tabular.Fields)), "")
 	for i := 0; i < len(keyval); i += 2 {
 		for j, field := range tabular.Fields {
@@ -46,8 +55,10 @@ func (tabular Tabular) Insertion(queryFmt string, keyval ...string) (query strin
 		"INSERT INTO `%s` (%s) VALUES (%s)",
 		tabular.Name,
 		fmt.Sprintf("`%s`", strings.Join(tabular.Fields, "`, `")),
-		strings.Join(values, ", "),
-	))
+		strings.TrimRight(strings.Repeat(
+			fmt.Sprintf("(%s), ", strings.Join(values, ", ")), rows,
+		), ", ")),
+	)
 }
 
 // Selection generates a list of all field-names including the joined ones in serial
