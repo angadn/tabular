@@ -52,7 +52,7 @@ func (tabular Tabular) BatchInsertion(
 	}
 
 	return fmt.Sprintf(queryFmt, fmt.Sprintf(
-		"INSERT INTO `%s` (%s) VALUES (%s)",
+		"INSERT INTO `%s` (%s) VALUES %s",
 		tabular.Name,
 		fmt.Sprintf("`%s`", strings.Join(tabular.Fields, "`, `")),
 		strings.TrimRight(strings.Repeat(
