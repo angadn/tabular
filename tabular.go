@@ -10,7 +10,7 @@ import (
 type Tabular struct {
 	Name       string
 	Fields     []string
-	selectNull bool
+	isSelectingNull bool
 }
 
 // New constructs a Tabular given a table-name and column-fields.
@@ -32,7 +32,7 @@ func (tabular Tabular) WithAlias(alias string) (aliased Tabular) {
 // each of it's fields. Useful when you want to perform UNIONs after JOINs.
 func (tabular Tabular) WithNullSelection() (nulled Tabular) {
 	nulled = tabular
-	nulled.selectNull = true
+	nulled.isSelectingNull = true
 	return
 }
 
@@ -96,12 +96,12 @@ func (tabular Tabular) selection(
 			formattedField := fmt.Sprintf(fieldFmt, t.Name, field)
 			if tableAsPrefix {
 				prefixed := fmt.Sprintf(prefixFmt, t.Name, field)
-				if t.selectNull {
+				if t.isSelectingNull {
 					formattedField = fmt.Sprintf("NULL AS %s", prefixed)
 				} else {
 					formattedField = fmt.Sprintf("%s AS %s", formattedField, prefixed)
 				}
-			} else if t.selectNull {
+			} else if t.isSelectingNull {
 				formattedField = fmt.Sprintf("NULL AS `%s`", field)
 			}
 
