@@ -8,8 +8,9 @@ import (
 // Tabular is a representation fo a Database Table, with it's Name and columns listed in
 // a serial order.
 type Tabular struct {
-	Name   string
-	Fields []string
+	Name       string
+	Fields     []string
+	isSelectingNull bool
 }
 
 // New constructs a Tabular given a table-name and column-fields.
@@ -24,6 +25,14 @@ func New(name string, fields ...string) (tabular Tabular) {
 func (tabular Tabular) WithAlias(alias string) (aliased Tabular) {
 	aliased = tabular
 	aliased.Name = alias
+	return
+}
+
+// WithNullSelection returns a Tabular that when selecting will return NULL once for
+// each of it's fields. Useful when you want to perform UNIONs after JOINs.
+func (tabular Tabular) WithNullSelection() (nulled Tabular) {
+	nulled = tabular
+	nulled.isSelectingNull = true
 	return
 }
 
@@ -67,10 +76,40 @@ func (tabular Tabular) BatchInsertion(
 // the specific JOIN relationships. The fragment is incomplete by design, as it allows
 // the user to define virtual fields, etc. in the query if required.
 func (tabular Tabular) Selection(queryFmt string, joined ...Tabular) (query string) {
-	q := func(t Tabular) string {
-		return fmt.Sprintf("`%s`.`%s`", t.Name, strings.Join(
-			t.Fields, fmt.Sprintf("`, `%s`.`", t.Name),
-		))
+	return tabular.selection(queryFmt, false, joined...)
+}
+
+// PrefixedSelection generates field-names same as Selection except here the field-names
+// will be prefixed with their table name.
+func (tabular Tabular) PrefixedSelection(queryFmt string, joined ...Tabular) (query string) {
+	return tabular.selection(queryFmt, true, joined...)
+}
+
+func (tabular Tabular) selection(
+	queryFmt string, tableAsPrefix bool, joined ...Tabular,
+) (query string) {
+	fieldFmt := "`%s`.`%s`"
+	prefixFmt := "`%s_%s`"
+
+	q := func(t Tabular) (ret string) {
+		for _, field := range t.Fields {
+			formattedField := fmt.Sprintf(fieldFmt, t.Name, field)
+			if tableAsPrefix {
+				prefixed := fmt.Sprintf(prefixFmt, t.Name, field)
+				if t.isSelectingNull {
+					formattedField = fmt.Sprintf("NULL AS %s", prefixed)
+				} else {
+					formattedField = fmt.Sprintf("%s AS %s", formattedField, prefixed)
+				}
+			} else if t.isSelectingNull {
+				formattedField = fmt.Sprintf("NULL AS `%s`", field)
+			}
+
+			ret = fmt.Sprintf("%s, %s", ret, formattedField)
+		}
+
+		ret = strings.TrimLeft(ret, ", ")
+		return
 	}
 
 	query = q(tabular)

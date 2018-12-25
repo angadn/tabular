@@ -45,3 +45,21 @@ func TestDualJoinSelection(t *testing.T) {
 		tab.Selection("SELECT %s FROM `users` WHERE ...", userTab, userTab.WithAlias("secondary_user")),
 	)
 }
+
+func TestNullSelection(t *testing.T) {
+	tab := New("campaigns", "id", "user_id", "enabled", "name").WithNullSelection()
+	userTab := New("users", "id", "email", "password", "secret")
+	fmt.Printf(
+		"Null Selection:\t%s\n\n",
+		tab.Selection("SELECT %s FROM `users` WHERE ...", userTab),
+	)
+}
+
+func TestTablePrefix(t *testing.T) {
+	tab := New("campaigns", "id", "user_id", "enabled", "name")
+	userTab := New("users", "id", "email", "password", "secret")
+	fmt.Printf(
+		"Prefix Selection:\t%s\n\n",
+		tab.PrefixedSelection("SELECT %s FROM `users` WHERE ...", userTab),
+	)
+}
