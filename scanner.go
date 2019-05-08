@@ -13,8 +13,8 @@ func NewScanner(fields ...interface{}) (scanner Scanner) {
 	return
 }
 
-// Scan *sql.Rows or *sql.Row into the fields for the Scanner, chaining with any other
-// Scanner(s) in the case of joins.
+// Scan *sql.Rows into the fields for the Scanner, chaining with any other Scanner(s) in
+// the case of joins.
 func (scanner Scanner) Scan(rows *sql.Rows, joined ...Scanner) (err error) {
 	fields := scanner.Fields
 	for i := 0; i < len(joined); i++ {
